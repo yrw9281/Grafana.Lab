@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard</title>
+</head>
+
+<body>
+    <h1>Hello, Grafana!</h1>
+    <p>This is a simple webpage served using Nginx and Docker.</p>
+    <button id="get-jwt">Get JWT</button>
+    <button id="view-jwt">View JWT on JWT.io</button>
+    <button id="refresh-iframe">Refresh iframe</button>
+    <p id="token-display"></p>
+    <div>
+        <iframe id="grafana-iframe-1" width="450" height="200" frameborder="0"></iframe>
+        <iframe id="grafana-iframe-2" width="450" height="200" frameborder="0"></iframe>
+    </div>
+
+    <script>
+        let currentToken = '';
+
+        async function fetchToken() {
+            try {
+                const response = await fetch('http://localhost:5001/auth');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                return data.token;
+            } catch (error) {
+                console.error('There has been a problem with your fetch operation:', error);
+                return null;
+            }
+        }
+
+        function displayToken(token) {
+            const tokenDisplay = document.getElementById('token-display');
+            tokenDisplay.textContent = token;
+        }
+
+        function updateIframeSrc(token) {
+            const iframe1 = document.getElementById('grafana-iframe-1');
+            iframe1.src = `http://localhost:3000/d-solo/ddwuexasqe60wa/test-dashboard?orgId=1&from=1725413884442&to=1725435484442&panelId=1&auth_token=${encodeURIComponent(token)}`;
+            const iframe2 = document.getElementById('grafana-iframe-2');
+            iframe2.src = `http://localhost:3000/d-solo/ddwuexasqe60wa/test-dashboard?orgId=1&from=1725413884442&to=1725435484442&panelId=2&auth_token=${encodeURIComponent(token)}`;
+        }
+
+        document.getElementById('get-jwt').addEventListener('click', async () => {
+            const token = await fetchToken();
+            if (token) {
+                currentToken = token;
+                displayToken(token);
+            }
+        });
+
+        document.getElementById('refresh-iframe').addEventListener('click', () => {
+            if (currentToken) {
+                updateIframeSrc(currentToken);
+            }
+        });
+
+        document.getElementById('view-jwt').addEventListener('click', () => {
+            if (currentToken) {
+                window.open(`https://jwt.io/?token=${encodeURIComponent(currentToken)}`, '_blank');
+            }
+        });
+    </script>
+</body>
+
+</html>

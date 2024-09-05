@@ -1,0 +1,27 @@
+services:
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    volumes:
+      - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards-provisioning:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./secrets/jwks.json:/etc/grafana/jwks.json
+  oauth:
+    build: ./oauth
+    container_name: oauth
+    ports:
+      - 5001:5001
+    volumes:
+      - ./secrets:/app/secrets
+  dashboard:
+    build: ./dashboard
+    container_name: dashboard
+    ports:
+      - "5002:80"
+    volumes:
+      - ./dashboard:/usr/share/nginx/html
