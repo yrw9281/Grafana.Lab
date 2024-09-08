@@ -90,8 +90,8 @@ app.MapGet("/auth", async () =>
         {
             Subject = new System.Security.Claims.ClaimsIdentity(new[]
             {
-                new System.Security.Claims.Claim("sub", "admin"),
-                new System.Security.Claims.Claim("role", "Admin")
+                new System.Security.Claims.Claim("sub", "service"),
+                new System.Security.Claims.Claim("role", "Viewer")
             }),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = signingCredentials
